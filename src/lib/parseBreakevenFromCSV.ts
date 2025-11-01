@@ -1,62 +1,42 @@
 import { realBreakevenData, realMintingData } from "./parseRealCSV";
 
-export interface BreakevenPoint {
-  entryN: number;
-  breakevenN: number;
-  nDifference: number;
+export interface InvestorProfitLine {
+  entryN: number; // Which investor cohort this line represents
+  profitData: { n: number; profit: number }[]; // Profit at each mint number
 }
 
-// Parse actual breakeven data from CSV columns G onwards
-// Each row has breakeven pool sizes - when pool reaches these values,
-// investors who entered at different N values break even
-export const parseBreakevenPoints = (): BreakevenPoint[] => {
-  const breakevenPoints: BreakevenPoint[] = [];
+// Parse investor profit/loss data from columns G onwards
+// Each column (G to AA) represents an investor entering at a specific N
+// Values show their profit/loss as minting continues
+export const parseInvestorProfitLines = (): InvestorProfitLine[] => {
+  const investorLines: InvestorProfitLine[] = [];
   
-  // Build a map of N to poolSize for quick lookup
-  const nToPoolSize = new Map<number, number>();
-  realMintingData.forEach(row => {
-    nToPoolSize.set(row.n, row.poolSize);
-  });
-  
-  // For each row with breakeven data, find when those investors break even
+  // Each entry in realBreakevenData has breakevenPoolSizes array
+  // representing profit/loss values for that investor cohort
   realBreakevenData.forEach(entry => {
     const entryN = entry.entryN;
+    const profitData: { n: number; profit: number }[] = [];
     
-    // Each breakeven pool size represents when an earlier investor breaks even
-    // We need to find which N corresponds to each pool size
-    entry.breakevenPoolSizes.forEach((breakevenPoolSize, index) => {
-      // Find the N where poolSize >= breakevenPoolSize
-      let breakevenN = entryN;
-      
-      for (let n = entryN; n <= 999; n++) {
-        const poolSize = nToPoolSize.get(n);
-        if (poolSize && poolSize >= breakevenPoolSize) {
-          breakevenN = n;
-          break;
-        }
-      }
-      
-      // Only add if we have meaningful data
-      if (breakevenN > entryN) {
-        breakevenPoints.push({
-          entryN: entryN,
-          breakevenN: breakevenN,
-          nDifference: breakevenN - entryN
+    // Each value in breakevenPoolSizes is actually the profit at successive N values
+    entry.breakevenPoolSizes.forEach((profit, index) => {
+      const currentN = entryN + index;
+      if (currentN <= 999) {
+        profitData.push({
+          n: currentN,
+          profit: profit
         });
       }
     });
-  });
-  
-  // Remove duplicates and sort
-  const uniquePoints = new Map<number, BreakevenPoint>();
-  breakevenPoints.forEach(point => {
-    const existing = uniquePoints.get(point.entryN);
-    if (!existing || point.nDifference < existing.nDifference) {
-      uniquePoints.set(point.entryN, point);
+    
+    if (profitData.length > 0) {
+      investorLines.push({
+        entryN,
+        profitData
+      });
     }
   });
   
-  return Array.from(uniquePoints.values()).sort((a, b) => a.entryN - b.entryN);
+  return investorLines.sort((a, b) => a.entryN - b.entryN);
 };
 
-export const breakevenData = parseBreakevenPoints();
+export const investorProfitLines = parseInvestorProfitLines();

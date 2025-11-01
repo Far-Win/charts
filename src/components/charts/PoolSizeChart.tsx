@@ -2,17 +2,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { mintingData, getChartConfig } from "@/lib/chartData";
 
-const TrendChart = () => {
+const PoolSizeChart = () => {
   const config = getChartConfig();
 
   return (
     <Card className="shadow-[var(--shadow-card)] border-border/50 transition-[var(--transition-smooth)] hover:shadow-lg">
       <CardHeader>
         <CardTitle className="text-2xl font-bold bg-[var(--gradient-primary)] bg-clip-text text-transparent">
-          Mint Price Trend
+          Pool Size Growth
         </CardTitle>
         <CardDescription className="text-muted-foreground">
-          Price per mint over time
+          Cumulative pool size over mint numbers
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -26,7 +26,7 @@ const TrendChart = () => {
             />
             <YAxis 
               stroke="hsl(var(--muted-foreground))"
-              label={{ value: 'Mint Price', angle: -90, position: 'insideLeft', fill: 'hsl(var(--muted-foreground))' }}
+              label={{ value: 'Pool Size', angle: -90, position: 'insideLeft', fill: 'hsl(var(--muted-foreground))' }}
             />
             <Tooltip 
               contentStyle={{ 
@@ -38,11 +38,11 @@ const TrendChart = () => {
             <Legend />
             <Line 
               type="monotone" 
-              dataKey="mintPrice" 
-              stroke={config.mintPrice.color} 
+              dataKey="poolSize" 
+              stroke={config.poolSize.color} 
               strokeWidth={2.5}
-              dot={{ fill: config.mintPrice.color, r: 3 }}
-              name={config.mintPrice.label}
+              dot={{ fill: config.poolSize.color, r: 3 }}
+              name={config.poolSize.label}
               activeDot={{ r: 6 }}
             />
           </LineChart>
@@ -52,4 +52,4 @@ const TrendChart = () => {
   );
 };
 
-export default TrendChart;
+export default PoolSizeChart;

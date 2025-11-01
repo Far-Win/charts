@@ -12,7 +12,7 @@ const ProbabilityChart = () => {
           Probability Distribution
         </CardTitle>
         <CardDescription className="text-muted-foreground">
-          Cumulative probability of winning by N
+          Binomial probability at each mint number
         </CardDescription>
       </CardHeader>
       <CardContent>

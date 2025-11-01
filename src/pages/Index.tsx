@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { TrendingUp, Coins, Percent, DollarSign } from "lucide-react";
 import TrendChart from "@/components/charts/TrendChart";
+import PoolSizeChart from "@/components/charts/PoolSizeChart";
 import ProbabilityChart from "@/components/charts/ProbabilityChart";
 import ContributionChart from "@/components/charts/ContributionChart";
 import BreakevenChart from "@/components/charts/BreakevenChart";
@@ -87,10 +88,11 @@ const Index = () => {
         {/* Charts Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           <TrendChart />
-          <ProbabilityChart />
+          <PoolSizeChart />
         </div>
 
-        <div className="grid grid-cols-1 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <ProbabilityChart />
           <ContributionChart />
         </div>
 

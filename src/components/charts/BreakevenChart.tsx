@@ -1,105 +1,97 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { Line, LineChart, XAxis, YAxis, CartesianGrid, ResponsiveContainer, ReferenceLine } from "recharts";
-import { breakevenData } from "@/lib/parseBreakevenFromCSV";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ReferenceLine } from "recharts";
+import { investorProfitLines } from "@/lib/parseBreakevenFromCSV";
 
 const BreakevenChart = () => {
-  const chartConfig = {
-    breakevenN: {
-      label: "Breakeven at N",
-      color: "hsl(var(--chart-1))",
-    },
-    entryN: {
-      label: "Entry at N",
-      color: "hsl(var(--chart-3))",
-    },
-  };
+  // Create a combined dataset with all investor profit lines
+  // Each investor's data needs to be merged into rows by N value
+  const allNValues = new Set<number>();
+  investorProfitLines.forEach(investor => {
+    investor.profitData.forEach(point => allNValues.add(point.n));
+  });
+
+  const chartData = Array.from(allNValues).sort((a, b) => a - b).map(n => {
+    const dataPoint: any = { n };
+    investorProfitLines.forEach(investor => {
+      const profitPoint = investor.profitData.find(p => p.n === n);
+      if (profitPoint) {
+        dataPoint[`investor_${investor.entryN}`] = profitPoint.profit;
+      }
+    });
+    return dataPoint;
+  });
+
+  // Generate colors for different investor lines
+  const colors = [
+    "hsl(var(--chart-1))",
+    "hsl(var(--chart-2))",
+    "hsl(var(--chart-3))",
+    "hsl(var(--chart-4))",
+    "hsl(var(--chart-5))",
+  ];
+
+  // Sample investors to show (to avoid cluttering with too many lines)
+  const selectedInvestors = investorProfitLines.filter((_, index) => 
+    index % Math.max(1, Math.floor(investorProfitLines.length / 8)) === 0
+  );
 
   return (
     <Card className="shadow-glow border-border/50">
       <CardHeader>
-        <CardTitle className="text-2xl">Investor Breakeven Analysis</CardTitle>
+        <CardTitle className="text-2xl">Investor Profit/Loss Analysis</CardTitle>
         <CardDescription>
-          Shows when investors entering at different N values reach breakeven
+          Profit trajectory for investors entering at different N values (columns G-AA)
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="h-[400px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart 
-              data={breakevenData}
-              margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-              <XAxis
-                dataKey="entryN"
-                label={{ value: 'Entry Point (N)', position: 'insideBottom', offset: -10 }}
-                className="text-muted-foreground"
-              />
-              <YAxis
-                label={{ value: 'Breakeven Point (N)', angle: -90, position: 'insideLeft' }}
-                className="text-muted-foreground"
-              />
-              <ChartTooltip
-                content={
-                  <ChartTooltipContent
-                    labelFormatter={(value) => `Entry at N=${value}`}
-                    formatter={(value, name) => [
-                      name === "breakevenN" ? `Breakeven at N=${value}` : `Entry at N=${value}`,
-                      name === "breakevenN" ? "Breakeven" : "Entry"
-                    ]}
-                  />
-                }
-              />
-              {/* Reference line showing immediate breakeven (y=x) */}
-              <ReferenceLine
-                stroke="hsl(var(--muted-foreground))"
-                strokeDasharray="3 3"
-                segment={[
-                  { x: 191, y: 191 },
-                  { x: 999, y: 999 }
-                ]}
-              />
-              {/* Breakeven line */}
+        <ResponsiveContainer width="100%" height={500}>
+          <LineChart 
+            data={chartData}
+            margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+            <XAxis
+              dataKey="n"
+              stroke="hsl(var(--muted-foreground))"
+              label={{ value: 'Mint Number (N)', position: 'insideBottom', offset: -10, fill: 'hsl(var(--muted-foreground))' }}
+            />
+            <YAxis
+              stroke="hsl(var(--muted-foreground))"
+              label={{ value: 'Profit/Loss', angle: -90, position: 'insideLeft', fill: 'hsl(var(--muted-foreground))' }}
+            />
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: 'hsl(var(--card))',
+                border: '1px solid hsl(var(--border))',
+                borderRadius: 'var(--radius)',
+              }}
+            />
+            <Legend />
+            
+            {/* Zero reference line */}
+            <ReferenceLine
+              y={0}
+              stroke="hsl(var(--muted-foreground))"
+              strokeDasharray="5 5"
+              strokeWidth={2}
+            />
+            
+            {/* Draw lines for selected investors */}
+            {selectedInvestors.map((investor, index) => (
               <Line
+                key={`investor_${investor.entryN}`}
                 type="monotone"
-                dataKey="breakevenN"
-                stroke="hsl(var(--chart-1))"
-                strokeWidth={3}
-                dot={{ fill: "hsl(var(--chart-1))", r: 3 }}
-                activeDot={{ r: 6 }}
+                dataKey={`investor_${investor.entryN}`}
+                stroke={colors[index % colors.length]}
+                strokeWidth={2}
+                dot={false}
+                name={`Entry N=${investor.entryN}`}
               />
-            </LineChart>
-          </ResponsiveContainer>
-        </ChartContainer>
-        <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-          <div className="flex flex-col gap-1">
-            <span className="text-muted-foreground">Earliest Entry (N=191)</span>
-            <span className="font-semibold text-lg">
-              Breakeven: N={breakevenData[0]?.breakevenN}
-            </span>
-            <span className="text-muted-foreground text-xs">
-              Wait: {breakevenData[0]?.nDifference} mints
-            </span>
-          </div>
-          <div className="flex flex-col gap-1">
-            <span className="text-muted-foreground">Mid Entry (N=500)</span>
-            <span className="font-semibold text-lg">
-              Breakeven: N={breakevenData.find(d => d.entryN >= 500)?.breakevenN || 'N/A'}
-            </span>
-            <span className="text-muted-foreground text-xs">
-              Wait: {breakevenData.find(d => d.entryN >= 500)?.nDifference || 0} mints
-            </span>
-          </div>
-          <div className="flex flex-col gap-1">
-            <span className="text-muted-foreground">Late Entry (N=900)</span>
-            <span className="font-semibold text-lg">
-              Breakeven: N={breakevenData.find(d => d.entryN >= 900)?.breakevenN || 'N/A'}
-            </span>
-            <span className="text-muted-foreground text-xs">
-              Wait: {breakevenData.find(d => d.entryN >= 900)?.nDifference || 0} mints
-            </span>
-          </div>
+            ))}
+          </LineChart>
+        </ResponsiveContainer>
+        <div className="mt-4 text-sm text-muted-foreground">
+          <p>Each line shows profit/loss for investors entering at different mint numbers. Breakeven occurs when the line crosses zero.</p>
         </div>
       </CardContent>
     </Card>
