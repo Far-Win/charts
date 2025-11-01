@@ -42,19 +42,21 @@ const parseCSVData = (csvText: string): {
       profitability
     });
     
-    // Parse breakeven data (columns 7 onwards, which is index 7+)
-    const breakevenPoolSizes: number[] = [];
+    // Parse investor profit data (columns G-AA, which are indices 7-27)
+    // Column G = investor entering at n=151, H = n=152, etc.
+    // Each row shows profit for all active investors at that mint number
+    const investorProfits: number[] = [];
     for (let j = 7; j < values.length; j++) {
       const val = parseFloat(values[j]);
       if (!isNaN(val)) {
-        breakevenPoolSizes.push(val);
+        investorProfits.push(val);
       }
     }
     
-    if (breakevenPoolSizes.length > 0) {
+    if (investorProfits.length > 0) {
       breakevenData.push({
         entryN: n,
-        breakevenPoolSizes
+        breakevenPoolSizes: investorProfits
       });
     }
   }

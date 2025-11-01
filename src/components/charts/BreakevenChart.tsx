@@ -21,26 +21,40 @@ const BreakevenChart = () => {
     return dataPoint;
   });
 
-  // Generate colors for different investor lines
+  // Generate distinct colors for all 21 investor lines
   const colors = [
     "hsl(var(--chart-1))",
     "hsl(var(--chart-2))",
     "hsl(var(--chart-3))",
     "hsl(var(--chart-4))",
     "hsl(var(--chart-5))",
+    "#8b5cf6", // purple
+    "#ec4899", // pink
+    "#f59e0b", // amber
+    "#10b981", // emerald
+    "#06b6d4", // cyan
+    "#6366f1", // indigo
+    "#f43f5e", // rose
+    "#84cc16", // lime
+    "#14b8a6", // teal
+    "#a855f7", // violet
+    "#fb923c", // orange
+    "#22d3ee", // sky
+    "#4ade80", // green
+    "#facc15", // yellow
+    "#e11d48", // red
+    "#7c3aed", // purple variant
   ];
 
-  // Sample investors to show (to avoid cluttering with too many lines)
-  const selectedInvestors = investorProfitLines.filter((_, index) => 
-    index % Math.max(1, Math.floor(investorProfitLines.length / 8)) === 0
-  );
+  // Show ALL 21 investor lines
+  const selectedInvestors = investorProfitLines;
 
   return (
     <Card className="shadow-glow border-border/50">
       <CardHeader>
         <CardTitle className="text-2xl">Investor Profit/Loss Analysis</CardTitle>
         <CardDescription>
-          Profit trajectory for investors entering at different N values (columns G-AA)
+          21 investor scenarios (n=151 to n=171) showing profit declining to breakeven and beyond
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -91,7 +105,7 @@ const BreakevenChart = () => {
           </LineChart>
         </ResponsiveContainer>
         <div className="mt-4 text-sm text-muted-foreground">
-          <p>Each line shows profit/loss for investors entering at different mint numbers. Breakeven occurs when the line crosses zero.</p>
+          <p>All 21 investor scenarios (n=151 through n=171). Each line shows profit declining as minting continues. Breakeven occurs when crossing zero into negative territory.</p>
         </div>
       </CardContent>
     </Card>
