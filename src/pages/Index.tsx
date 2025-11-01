@@ -2,6 +2,7 @@ import { TrendingUp, Coins, Percent, DollarSign } from "lucide-react";
 import TrendChart from "@/components/charts/TrendChart";
 import ProbabilityChart from "@/components/charts/ProbabilityChart";
 import ContributionChart from "@/components/charts/ContributionChart";
+import BreakevenChart from "@/components/charts/BreakevenChart";
 import StatsCard from "@/components/charts/StatsCard";
 import { mintingData, fullMintingData } from "@/lib/chartData";
 
@@ -70,6 +71,9 @@ const Index = () => {
           <ContributionChart />
         </div>
 
+        <div className="grid grid-cols-1 gap-8 mt-8">
+          <BreakevenChart />
+        </div>
       </main>
 
       {/* Footer */}

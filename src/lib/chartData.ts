@@ -9,8 +9,8 @@ export interface MintData {
   profitability?: number;
 }
 
-// Import real parsed data
-import { realMintingData as importedRealData } from "./realDataParser";
+// Import real parsed data from CSV
+import { realMintingData as importedRealData } from "./parseRealCSV";
 
 // Full dataset will be loaded from the fetched spreadsheet
 // For optimal visualization, we sample every Nth row for large datasets
