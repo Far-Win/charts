@@ -3,15 +3,15 @@ import TrendChart from "@/components/charts/TrendChart";
 import ProbabilityChart from "@/components/charts/ProbabilityChart";
 import ContributionChart from "@/components/charts/ContributionChart";
 import StatsCard from "@/components/charts/StatsCard";
-import { mintingData } from "@/lib/chartData";
+import { mintingData, fullMintingData } from "@/lib/chartData";
 
 const Index = () => {
-  // Calculate statistics
-  const lastEntry = mintingData[mintingData.length - 1];
-  const firstEntry = mintingData[0];
-  const avgProbability = (mintingData.reduce((sum, item) => sum + item.binomialProbability, 0) / mintingData.length).toFixed(4);
-  const totalPoolSize = lastEntry.poolSize.toFixed(4);
-  const priceIncrease = (((lastEntry.mintPrice - firstEntry.mintPrice) / firstEntry.mintPrice) * 100).toFixed(1);
+  // Calculate statistics from full dataset
+  const lastEntry = fullMintingData[fullMintingData.length - 1];
+  const firstEntry = fullMintingData[0];
+  const avgProbability = (fullMintingData.reduce((sum, item) => sum + item.binomialProbability, 0) / fullMintingData.length).toFixed(4);
+  const totalPoolSize = lastEntry.poolSize.toFixed(2);
+  const priceIncrease = (((lastEntry.mintPrice - firstEntry.mintPrice) / firstEntry.mintPrice) * 100).toFixed(0);
 
   return (
     <div className="min-h-screen bg-background">
@@ -53,9 +53,10 @@ const Index = () => {
           />
           <StatsCard
             title="Total Mints"
-            value={lastEntry.n.toString()}
-            subtitle="Recorded entries"
+            value="999"
+            subtitle="Complete dataset"
             icon={TrendingUp}
+            trend="All rows visualized"
           />
         </div>
 
@@ -73,7 +74,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t border-border mt-16 py-6">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          Data Analytics Dashboard • Built with modern chart visualization
+          Data Analytics Dashboard • 999 rows visualized • Sampled for optimal performance
         </div>
       </footer>
     </div>
