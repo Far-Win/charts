@@ -6,13 +6,15 @@ export interface InvestorProfitLine {
 }
 
 // Parse investor profit/loss data from columns G-AA
-// Column G = investor entering at n=151
-// Column H = investor entering at n=152
-// ... 
-// Column AA = investor entering at n=171 (21 investors total)
+// Column G = investor entering at n=10
+// Column H = investor entering at n=30
+// Column I = investor entering at n=50
+// ... and so on (new investor every 20 mints)
+// 21 investors total entering at n=10, 30, 50, ..., 410
 export const parseInvestorProfitLines = (breakevenData: BreakevenEntry[]): InvestorProfitLine[] => {
   const investorLines: InvestorProfitLine[] = [];
-  const FIRST_INVESTOR_N = 151; // First investor enters at n=151
+  const FIRST_INVESTOR_N = 10; // First investor enters at n=10
+  const INVESTOR_ENTRY_INTERVAL = 20; // New investor every 20 mints
   const NUM_INVESTORS = 21; // Columns G through AA = 21 columns
   
   // Build a map of n -> investor profits array
@@ -23,7 +25,7 @@ export const parseInvestorProfitLines = (breakevenData: BreakevenEntry[]): Inves
   
   // Create a line for each of the 21 investors
   for (let investorIndex = 0; investorIndex < NUM_INVESTORS; investorIndex++) {
-    const entryN = FIRST_INVESTOR_N + investorIndex;
+    const entryN = FIRST_INVESTOR_N + (investorIndex * INVESTOR_ENTRY_INTERVAL);
     const profitData: { n: number; profit: number }[] = [];
     
     // For each row starting from this investor's entry point

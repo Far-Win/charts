@@ -18,10 +18,10 @@ const BreakevenChart = () => {
     return (
       <Card className="shadow-glow border-border/50">
         <CardHeader>
-          <CardTitle className="text-2xl">Investor Profit/Loss Analysis</CardTitle>
-          <CardDescription>
-            21 investor scenarios (n=151 to n=171) showing profit declining to breakeven and beyond
-          </CardDescription>
+        <CardTitle className="text-2xl">Investor Profit/Loss Analysis</CardTitle>
+        <CardDescription>
+          21 investor scenarios entering at n=10, 30, 50, ... 410 (every 20 mints)
+        </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center h-[500px]">
@@ -86,7 +86,7 @@ const BreakevenChart = () => {
       <CardHeader>
         <CardTitle className="text-2xl">Investor Profit/Loss Analysis</CardTitle>
         <CardDescription>
-          21 investor scenarios (n=151 to n=171) showing profit declining to breakeven and beyond
+          21 investor scenarios entering at n=10, 30, 50, ... 410 (every 20 mints)
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -137,7 +137,7 @@ const BreakevenChart = () => {
           </LineChart>
         </ResponsiveContainer>
         <div className="mt-4 text-sm text-muted-foreground">
-          <p>All 21 investor scenarios (n=151 through n=171). Each line shows profit declining as minting continues. Breakeven occurs when crossing zero into negative territory.</p>
+          <p>All 21 investor scenarios entering every 20 mints (n=10, 30, 50, ... 410). Each line shows profit declining as minting continues. Breakeven occurs when crossing zero into negative territory.</p>
         </div>
       </CardContent>
     </Card>
