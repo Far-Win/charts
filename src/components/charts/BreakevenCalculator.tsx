@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { getRealData } from "@/lib/parseRealCSV";
 import { MintData } from "@/lib/chartData";
@@ -13,6 +13,7 @@ const BreakevenCalculator = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<MintData[]>([]);
   const [selectedEntry, setSelectedEntry] = useState(11);
+  const [inputValue, setInputValue] = useState("11");
   const [probability, setProbability] = useState(90);
 
   useEffect(() => {
@@ -63,8 +64,20 @@ const BreakevenCalculator = () => {
   const formatETH = (value: number) => `${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETH`;
   const formatPercent = (value: number) => `${value.toFixed(1)}%`;
 
-  // Generate entry point options
-  const entryPoints = Array.from({ length: 21 }, (_, i) => 11 + i * 20);
+  // Get valid range from data
+  const minN = data[0]?.n || 0;
+  const maxN = data[data.length - 1]?.n || 0;
+  
+  // Validate entered N exists in data
+  const isValidEntry = data.some(d => d.n === selectedEntry);
+
+  const handleInputChange = (value: string) => {
+    setInputValue(value);
+    const numValue = parseInt(value);
+    if (!isNaN(numValue) && data.some(d => d.n === numValue)) {
+      setSelectedEntry(numValue);
+    }
+  };
 
   return (
     <Card>
@@ -77,19 +90,19 @@ const BreakevenCalculator = () => {
       <CardContent className="space-y-6">
         {/* Entry Point Selection */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">Entry Point (N)</label>
-          <Select value={selectedEntry.toString()} onValueChange={(value) => setSelectedEntry(parseInt(value))}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select entry point" />
-            </SelectTrigger>
-            <SelectContent>
-              {entryPoints.map((n) => (
-                <SelectItem key={n} value={n.toString()}>
-                  N = {n}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <label className="text-sm font-medium">Entry Point (Mint Number N)</label>
+          <Input
+            type="number"
+            value={inputValue}
+            onChange={(e) => handleInputChange(e.target.value)}
+            min={minN}
+            max={maxN}
+            className={!isValidEntry ? "border-destructive" : ""}
+          />
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>Valid range: {minN} to {maxN}</span>
+            {!isValidEntry && <span className="text-destructive">Invalid entry point</span>}
+          </div>
         </div>
 
         {/* Probability Slider */}

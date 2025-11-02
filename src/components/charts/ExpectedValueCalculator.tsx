@@ -1,21 +1,21 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { getRealData } from "@/lib/parseRealCSV";
 import { generateRiskAnalysis, type RiskAnalysis } from "@/lib/investorAnalysis";
+import { MintData } from "@/lib/chartData";
 import { Loader2 } from "lucide-react";
 
 const ExpectedValueCalculator = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const [riskData, setRiskData] = useState<RiskAnalysis[]>([]);
+  const [data, setData] = useState<MintData[]>([]);
   const [selectedEntry, setSelectedEntry] = useState<number>(11);
+  const [inputValue, setInputValue] = useState("11");
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getRealData();
-      const entryPoints = Array.from({ length: 21 }, (_, i) => 11 + i * 20);
-      const analysis = generateRiskAnalysis(data.mintingData, entryPoints);
-      setRiskData(analysis);
+      const result = await getRealData();
+      setData(result.mintingData);
       setIsLoading(false);
     };
     fetchData();
@@ -31,7 +31,24 @@ const ExpectedValueCalculator = () => {
     );
   }
 
-  const selected = riskData.find(d => d.entryN === selectedEntry);
+  // Get valid range from data
+  const minN = data[0]?.n || 0;
+  const maxN = data[data.length - 1]?.n || 0;
+  
+  // Validate entered N exists in data
+  const isValidEntry = data.some(d => d.n === selectedEntry);
+
+  const handleInputChange = (value: string) => {
+    setInputValue(value);
+    const numValue = parseInt(value);
+    if (!isNaN(numValue) && data.some(d => d.n === numValue)) {
+      setSelectedEntry(numValue);
+    }
+  };
+
+  // Calculate analysis for selected entry on the fly
+  const analysis = generateRiskAnalysis(data, [selectedEntry]);
+  const selected = analysis[0];
 
   if (!selected) return null;
 
@@ -46,20 +63,20 @@ const ExpectedValueCalculator = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div>
-          <label className="text-sm font-medium mb-2 block">Entry Point (Mint Number)</label>
-          <Select value={selectedEntry.toString()} onValueChange={(v) => setSelectedEntry(Number(v))}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {riskData.map(d => (
-                <SelectItem key={d.entryN} value={d.entryN.toString()}>
-                  N = {d.entryN}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Entry Point (Mint Number N)</label>
+          <Input
+            type="number"
+            value={inputValue}
+            onChange={(e) => handleInputChange(e.target.value)}
+            min={minN}
+            max={maxN}
+            className={!isValidEntry ? "border-destructive" : ""}
+          />
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>Valid range: {minN} to {maxN}</span>
+            {!isValidEntry && <span className="text-destructive">Invalid entry point</span>}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
