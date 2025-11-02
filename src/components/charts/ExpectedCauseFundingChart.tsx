@@ -108,7 +108,7 @@ export const ExpectedCauseFundingChart = () => {
             <strong>Expected %:</strong> Probability-weighted average of cause contributions across all possible win outcomes
           </p>
           <p>
-            <strong>Breakeven %:</strong> Contribution if investor wins exactly at their breakeven point (~50% of their total spend)
+            <strong>Breakeven %:</strong> Contribution if investor wins exactly at their breakeven point (reference line)
           </p>
         </div>
       </CardContent>
