@@ -24,7 +24,7 @@ const BreakevenChart = () => {
         </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-center h-[500px]">
+          <div className="flex items-center justify-center h-[800px]">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
               <p className="text-muted-foreground">Loading investor data...</p>
@@ -90,7 +90,7 @@ const BreakevenChart = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={500}>
+        <ResponsiveContainer width="100%" height={800}>
           <LineChart 
             data={chartData}
             margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
