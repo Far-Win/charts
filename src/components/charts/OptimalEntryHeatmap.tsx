@@ -134,13 +134,13 @@ export const OptimalEntryHeatmap = () => {
     return points;
   }, [data]);
 
-  // Grid dimensions
-  const cellWidth = 40;
-  const cellHeight = 30;
-  const marginLeft = 80;
-  const marginTop = 50;
-  const marginBottom = 40;
-  const marginRight = 100;
+  // Grid dimensions - optimized for single screen width
+  const cellWidth = 24;
+  const cellHeight = 26;
+  const marginLeft = 70;
+  const marginTop = 40;
+  const marginBottom = 35;
+  const marginRight = 80;
 
   const entryPoints = useMemo(() => 
     [...new Set(heatmapData.map(d => d.entryN))].sort((a, b) => a - b),
@@ -191,7 +191,7 @@ export const OptimalEntryHeatmap = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="relative overflow-x-auto">
+        <div className="relative w-full flex justify-center">
           <svg 
             width={svgWidth} 
             height={svgHeight}
