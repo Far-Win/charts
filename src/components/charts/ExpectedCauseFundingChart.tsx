@@ -52,7 +52,7 @@ export const ExpectedCauseFundingChart = () => {
         <CardTitle>Expected vs Breakeven Cause Funding</CardTitle>
         <CardDescription>
           Comparing probability-weighted expected contributions to breakeven scenario.
-          The geometric distribution's long tail means investors may contribute more than the breakeven 50% on average.
+          Each investor mints until winning - early wins mean less cause contribution and more profit, late wins mean more contribution and potential losses.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -99,15 +99,16 @@ export const ExpectedCauseFundingChart = () => {
         
         <div className="mt-4 space-y-2 text-sm text-muted-foreground">
           <p>
-            <strong>Key Insight:</strong> While 63.2% of investors win within 256 mints, 
-            the geometric distribution has a long tail. The minority who win late contribute 
-            disproportionately more to the cause, pulling the expected value above 50%.
+            <strong>Key Insight:</strong> A single investor mints continuously until winning the white square. 
+            While most (63.2%) win within 256 mints with moderate cause contributions, 
+            the geometric distribution's long tail means some unlucky investors mint far beyond their breakeven point, 
+            contributing disproportionately more to the cause and potentially losing money.
           </p>
           <p>
-            <strong>Expected %:</strong> Probability-weighted average accounting for all possible outcomes
+            <strong>Expected %:</strong> Probability-weighted average of cause contributions across all possible win outcomes
           </p>
           <p>
-            <strong>Breakeven %:</strong> Contribution if investor exits exactly at their breakeven point (~50%)
+            <strong>Breakeven %:</strong> Contribution if investor wins exactly at their breakeven point (~50% of their total spend)
           </p>
         </div>
       </CardContent>
