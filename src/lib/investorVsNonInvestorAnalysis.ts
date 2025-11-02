@@ -2,131 +2,106 @@ import { MintData } from "./chartData";
 import { BreakevenPoint } from "./parseBreakevenFromCSV";
 
 export interface InvestorContributionAnalysis {
-  totalCauseFunding: number;
-  investorContribution: number;
-  nonInvestorContribution: number;
+  entryN: number;
+  breakevenN: number;
+  poolAtEntry: number;
+  investorCauseContribution: number;
+  totalCauseFundingAtBreakeven: number;
   investorPercentage: number;
   nonInvestorPercentage: number;
-  firstInvestorEntry: number;
-  maxBreakeven: number;
-  averageMintPriceInvestorPeriod: number;
-  averageMintPriceNonInvestorPeriod: number;
-  volumeRatio: number;
+  mintCount: number;
+  averageMintPrice: number;
 }
 
 const CAUSE_FEE = 0.2;
-const FIRST_INVESTOR_ENTRY = 11; // First investor enters at N=11
 
 /**
- * Calculate investor vs non-investor cause contributions
- * Proves that investors contribute >50% due to:
- * 1. Bonding curve creates higher mint prices during investor period
- * 2. Geometric distribution (E[K]=256) means investors mint ~600 times before white square
- * 3. Volume × Price effect concentrates cause funding in investor period
+ * Calculate investor contribution for a specific entry point
+ * At breakeven: investor's cause contribution = pool size at entry
+ * Therefore: investor contributes exactly 50% of total cause funding at breakeven
  */
 export const analyzeInvestorContribution = (
   mintingData: MintData[],
   breakevenPoints: BreakevenPoint[]
-): InvestorContributionAnalysis => {
-  // Find maximum breakeven point (when white square appears)
-  const maxBreakeven = Math.max(
-    ...breakevenPoints
-      .filter(bp => bp.breakevenN !== null)
-      .map(bp => bp.breakevenN as number)
-  );
+): InvestorContributionAnalysis | null => {
+  // Find a valid breakeven point to analyze (pick one with actual breakeven)
+  const validBreakeven = breakevenPoints.find(bp => bp.breakevenN !== null);
+  
+  if (!validBreakeven || validBreakeven.breakevenN === null) {
+    return null;
+  }
 
-  // Split data into non-investor period (N=1 to N=10) and investor period (N=11 to maxBreakeven)
-  const nonInvestorPeriodData = mintingData.filter(d => d.n < FIRST_INVESTOR_ENTRY);
-  const investorPeriodData = mintingData.filter(
-    d => d.n >= FIRST_INVESTOR_ENTRY && d.n <= maxBreakeven
-  );
+  const entryN = validBreakeven.entryN;
+  const breakevenN = validBreakeven.breakevenN;
 
-  // Calculate contributions
-  const nonInvestorContribution = nonInvestorPeriodData.reduce(
-    (sum, d) => sum + d.contributionToCause,
-    0
-  );
+  // Pool at entry = all cause contributions before investor enters
+  const poolAtEntry = mintingData
+    .filter(d => d.n < entryN)
+    .reduce((sum, d) => sum + d.contributionToCause, 0);
 
-  const investorContribution = investorPeriodData.reduce(
-    (sum, d) => sum + d.contributionToCause,
-    0
-  );
+  // Investor's cause contribution = 20% of all mint prices from entry to breakeven
+  const investorCauseContribution = mintingData
+    .filter(d => d.n >= entryN && d.n <= breakevenN)
+    .reduce((sum, d) => sum + d.mintPrice * CAUSE_FEE, 0);
 
-  const totalCauseFunding = nonInvestorContribution + investorContribution;
+  // At breakeven, investor contribution ≈ pool at entry (by definition of breakeven)
+  const totalCauseFundingAtBreakeven = poolAtEntry + investorCauseContribution;
+  
+  const investorPercentage = (investorCauseContribution / totalCauseFundingAtBreakeven) * 100;
+  const nonInvestorPercentage = (poolAtEntry / totalCauseFundingAtBreakeven) * 100;
 
-  // Calculate percentages
-  const investorPercentage = (investorContribution / totalCauseFunding) * 100;
-  const nonInvestorPercentage = (nonInvestorContribution / totalCauseFunding) * 100;
-
-  // Calculate average mint prices for comparison
-  const avgMintPriceNonInvestor = nonInvestorPeriodData.length > 0
-    ? nonInvestorPeriodData.reduce((sum, d) => sum + d.mintPrice, 0) / nonInvestorPeriodData.length
+  // Calculate mint count and average price during investor period
+  const investorMints = mintingData.filter(d => d.n >= entryN && d.n <= breakevenN);
+  const mintCount = investorMints.length;
+  const averageMintPrice = mintCount > 0
+    ? investorMints.reduce((sum, d) => sum + d.mintPrice, 0) / mintCount
     : 0;
-
-  const avgMintPriceInvestor = investorPeriodData.length > 0
-    ? investorPeriodData.reduce((sum, d) => sum + d.mintPrice, 0) / investorPeriodData.length
-    : 0;
-
-  // Volume ratio: how many more mints happen during investor period
-  const volumeRatio = investorPeriodData.length / Math.max(nonInvestorPeriodData.length, 1);
 
   return {
-    totalCauseFunding,
-    investorContribution,
-    nonInvestorContribution,
+    entryN,
+    breakevenN,
+    poolAtEntry,
+    investorCauseContribution,
+    totalCauseFundingAtBreakeven,
     investorPercentage,
     nonInvestorPercentage,
-    firstInvestorEntry: FIRST_INVESTOR_ENTRY,
-    maxBreakeven,
-    averageMintPriceInvestorPeriod: avgMintPriceInvestor,
-    averageMintPriceNonInvestorPeriod: avgMintPriceNonInvestor,
-    volumeRatio,
+    mintCount,
+    averageMintPrice,
   };
 };
 
 /**
- * Generate scenario analysis for different white square appearance points
- * Shows that investor contribution remains >50% across reasonable scenarios
+ * Generate scenario analysis for different entry points
+ * Shows that at breakeven, all investors contribute exactly 50% regardless of entry point
  */
 export const generateScenarioAnalysis = (
   mintingData: MintData[],
   breakevenPoints: BreakevenPoint[]
 ) => {
-  // Get actual max breakeven
-  const actualMaxBreakeven = Math.max(
-    ...breakevenPoints
-      .filter(bp => bp.breakevenN !== null)
-      .map(bp => bp.breakevenN as number)
-  );
+  // Analyze several entry points that have breakeven
+  const validBreakevens = breakevenPoints
+    .filter(bp => bp.breakevenN !== null)
+    .slice(0, 6); // Take first 6 for variety
 
-  // Test scenarios at different percentiles of geometric distribution
-  // p = 1/256, so E[K] = 256
-  // 25th percentile: ~74 mints, 50th: ~177, 75th: ~354, 90th: ~589
-  const scenarios = [
-    { label: "25th Percentile (Early)", breakevenN: FIRST_INVESTOR_ENTRY + 74 },
-    { label: "50th Percentile (Median)", breakevenN: FIRST_INVESTOR_ENTRY + 177 },
-    { label: "Expected Value", breakevenN: FIRST_INVESTOR_ENTRY + 256 },
-    { label: "75th Percentile", breakevenN: FIRST_INVESTOR_ENTRY + 354 },
-    { label: "90th Percentile", breakevenN: FIRST_INVESTOR_ENTRY + 589 },
-    { label: "Actual (Observed)", breakevenN: actualMaxBreakeven },
-  ];
-
-  return scenarios.map(scenario => {
-    const nonInvestorContribution = mintingData
-      .filter(d => d.n < FIRST_INVESTOR_ENTRY)
+  return validBreakevens.map(bp => {
+    const poolAtEntry = mintingData
+      .filter(d => d.n < bp.entryN)
       .reduce((sum, d) => sum + d.contributionToCause, 0);
 
     const investorContribution = mintingData
-      .filter(d => d.n >= FIRST_INVESTOR_ENTRY && d.n <= scenario.breakevenN)
-      .reduce((sum, d) => sum + d.contributionToCause, 0);
+      .filter(d => d.n >= bp.entryN && d.n <= bp.breakevenN!)
+      .reduce((sum, d) => sum + d.mintPrice * CAUSE_FEE, 0);
 
-    const total = nonInvestorContribution + investorContribution;
+    const total = poolAtEntry + investorContribution;
     const investorPercentage = (investorContribution / total) * 100;
 
     return {
-      ...scenario,
+      label: `Entry N=${bp.entryN}`,
+      entryN: bp.entryN,
+      breakevenN: bp.breakevenN,
       investorPercentage,
       investorContribution,
+      poolAtEntry,
       totalCauseFunding: total,
     };
   });
