@@ -13,7 +13,6 @@ import CapitalRequirementsTable from "@/components/charts/CapitalRequirementsTab
 import BreakevenCalculator from "@/components/charts/BreakevenCalculator";
 import { OptimalEntryHeatmap } from "@/components/charts/OptimalEntryHeatmap";
 import { CauseFundingAttributionChart } from "@/components/charts/CauseFundingAttributionChart";
-import { InvestorContributionProof } from "@/components/charts/InvestorContributionProof";
 import StatsCard from "@/components/charts/StatsCard";
 import { getRealData } from "@/lib/parseRealCSV";
 import type { MintData } from "@/lib/chartData";
@@ -129,16 +128,6 @@ const Index = () => {
             <RiskAnalysisChart />
             <CapitalRequirementsTable />
           </div>
-        </div>
-
-        {/* Breakeven Analysis Section */}
-        <div className="mt-16">
-          <h2 className="text-3xl font-bold mb-2">📐 Breakeven Analysis: 50/50 Cause Funding Split</h2>
-          <p className="text-muted-foreground mb-8">
-            IF an investor reaches breakeven, they contribute exactly 50% of total cause funding (their contribution equals the pool)
-          </p>
-          
-          <InvestorContributionProof />
         </div>
       </main>
 
