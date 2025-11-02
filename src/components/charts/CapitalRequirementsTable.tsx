@@ -31,6 +31,7 @@ const CapitalRequirementsTable = () => {
   }
 
   const formatCurrency = (value: number) => `$${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+  const formatETH = (value: number) => `${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETH`;
 
   return (
     <Card>
@@ -46,7 +47,7 @@ const CapitalRequirementsTable = () => {
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[100px]">Entry N</TableHead>
-                <TableHead className="text-right">Pool Size</TableHead>
+                <TableHead className="text-right">Pool Size (ETH)</TableHead>
                 <TableHead className="text-right">Expected Profit</TableHead>
                 <TableHead className="text-right">50% Capital</TableHead>
                 <TableHead className="text-right">90% Capital</TableHead>
@@ -61,7 +62,7 @@ const CapitalRequirementsTable = () => {
                 return (
                   <TableRow key={risk.entryN}>
                     <TableCell className="font-medium">{risk.entryN}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(risk.poolSizeAtEntry)}</TableCell>
+                    <TableCell className="text-right">{formatETH(risk.poolSizeAtEntry)}</TableCell>
                     <TableCell className={`text-right font-medium ${risk.expectedProfit > 0 ? 'text-chart-4' : 'text-destructive'}`}>
                       {formatCurrency(risk.expectedProfit)}
                     </TableCell>

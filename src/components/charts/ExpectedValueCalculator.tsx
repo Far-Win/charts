@@ -36,6 +36,7 @@ const ExpectedValueCalculator = () => {
   if (!selected) return null;
 
   const formatCurrency = (value: number) => `$${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+  const formatETH = (value: number) => `${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETH`;
 
   return (
     <Card>
@@ -65,7 +66,7 @@ const ExpectedValueCalculator = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2 p-4 rounded-lg bg-muted/50">
             <div className="text-sm text-muted-foreground">Pool Size at Entry</div>
-            <div className="text-2xl font-bold text-chart-2">{formatCurrency(selected.poolSizeAtEntry)}</div>
+            <div className="text-2xl font-bold text-chart-2">{formatETH(selected.poolSizeAtEntry)}</div>
           </div>
 
           <div className="space-y-2 p-4 rounded-lg bg-muted/50">
