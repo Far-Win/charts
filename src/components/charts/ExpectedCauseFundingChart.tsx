@@ -17,6 +17,12 @@ export const ExpectedCauseFundingChart = () => {
         const breakevenPoints = await getBreakevenPoints();
         const analysis = calculateExpectedCauseFundingAnalysis(mintingData, breakevenPoints);
         
+        // Log specific entry point for N=131
+        const entry131 = analysis.find(a => a.entryN === 131);
+        if (entry131) {
+          console.log(`Entry N=131: Breakeven at N=${entry131.breakevenN}, Breakeven Cause % = ${entry131.breakevenPercentage.toFixed(4)}%`);
+        }
+        
         // Filter to every 10th entry for cleaner visualization
         const filtered = analysis.filter((_, i) => i % 10 === 0);
         setData(filtered);
