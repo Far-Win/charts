@@ -215,59 +215,37 @@ export const InvestorContributionProof = () => {
         </CardContent>
       </Card>
 
-      {/* Scenario Analysis */}
+      {/* Key Insight */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="w-5 h-5" />
-            Consistency Across Entry Points
+            <Users className="w-5 h-5" />
+            Key Insight: IF Breakeven is Reached
           </CardTitle>
           <CardDescription>
-            All investors contribute exactly 50% at their breakeven point, regardless of entry timing
+            This analysis shows what happens IF an investor reaches breakeven - not all entry points are equally likely to succeed
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={scenarios} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
-              <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
-              <XAxis
-                dataKey="label"
-                angle={-45}
-                textAnchor="end"
-                height={100}
-                interval={0}
-              />
-              <YAxis 
-                domain={[45, 55]}
-                label={{ 
-                  value: 'Investor Contribution %', 
-                  angle: -90, 
-                  position: 'insideLeft' 
-                }}
-              />
-              <Tooltip 
-                formatter={(value: number) => `${value.toFixed(2)}%`}
-                labelFormatter={(label) => `Entry: ${label}`}
-              />
-              <ReferenceLine y={50} stroke="hsl(var(--primary))" strokeDasharray="3 3">
-                <Label value="50% (Theoretical)" position="right" />
-              </ReferenceLine>
-              <Bar dataKey="investorPercentage" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-          
-          <div className="text-sm text-muted-foreground space-y-2 mt-4">
+          <div className="text-sm text-muted-foreground space-y-3">
             <p>
               <strong>Mathematical Certainty:</strong> At breakeven, every investor's cause contribution equals 
-              the pool they win. This is the definition of breakeven: Profit = Pool - Cost = 0.
+              the pool they win. This is the definition of breakeven: Profit = Pool - Cause Contribution = 0.
             </p>
             <p>
               Since Total Cause Funding = Pool (non-investors) + Investor Contribution, and Pool = Investor Contribution 
               at breakeven, the ratio is always{' '}
               <span className="font-semibold text-foreground">exactly 50% / 50%</span>.
             </p>
-            <p className="text-xs">
-              Note: Small variations from 50.0% in the data are due to rounding and the discrete nature of the mints.
+            <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 mt-4">
+              <p className="text-amber-700 dark:text-amber-400 text-sm">
+                <strong>⚠️ Important Caveat:</strong> Early entry points (low N like N={analysis.entryN}) require many more mints 
+                ({analysis.mintCount} in this case) to reach breakeven. With white square probability of 1/256 per mint, 
+                early entries are LESS likely to actually hit the white square and reach breakeven compared to later entries.
+              </p>
+            </div>
+            <p className="text-xs mt-2">
+              Note: Small variations from exactly 50.0% are due to rounding and the discrete nature of the mints.
             </p>
           </div>
         </CardContent>

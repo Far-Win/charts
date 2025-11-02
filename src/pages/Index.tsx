@@ -131,11 +131,11 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Mathematical Proof Section */}
+        {/* Breakeven Analysis Section */}
         <div className="mt-16">
-          <h2 className="text-3xl font-bold mb-2">📐 Mathematical Proof: 50/50 Cause Funding Split</h2>
+          <h2 className="text-3xl font-bold mb-2">📐 Breakeven Analysis: 50/50 Cause Funding Split</h2>
           <p className="text-muted-foreground mb-8">
-            At breakeven, investors contribute exactly 50% of total cause funding (their contribution equals the pool they win)
+            IF an investor reaches breakeven, they contribute exactly 50% of total cause funding (their contribution equals the pool)
           </p>
           
           <InvestorContributionProof />
