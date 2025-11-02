@@ -105,7 +105,7 @@ const BreakevenChart = () => {
             />
             <YAxis
               stroke="hsl(var(--muted-foreground))"
-              label={{ value: 'Profit/Loss', angle: -90, position: 'insideLeft', fill: 'hsl(var(--muted-foreground))' }}
+              label={{ value: 'Profit/Loss (ETH)', angle: -90, position: 'insideLeft', fill: 'hsl(var(--muted-foreground))' }}
             />
             <Tooltip 
               contentStyle={{ 
