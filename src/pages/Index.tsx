@@ -7,6 +7,9 @@ import ContributionChart from "@/components/charts/ContributionChart";
 import BreakevenChart from "@/components/charts/BreakevenChart";
 import BreakevenPointChart from "@/components/charts/BreakevenPointChart";
 import ProfitableDurationChart from "@/components/charts/ProfitableDurationChart";
+import ExpectedValueCalculator from "@/components/charts/ExpectedValueCalculator";
+import RiskAnalysisChart from "@/components/charts/RiskAnalysisChart";
+import CapitalRequirementsTable from "@/components/charts/CapitalRequirementsTable";
 import StatsCard from "@/components/charts/StatsCard";
 import { getRealData } from "@/lib/parseRealCSV";
 import type { MintData } from "@/lib/chartData";
@@ -105,6 +108,20 @@ const Index = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
           <BreakevenPointChart />
           <ProfitableDurationChart />
+        </div>
+
+        {/* Risk Analysis Section */}
+        <div className="mt-16">
+          <h2 className="text-3xl font-bold mb-2">📊 Investor Risk Analysis</h2>
+          <p className="text-muted-foreground mb-8">
+            Expected value calculations and capital requirements for different entry points (assumes 1/256 white probability and unlimited games)
+          </p>
+          
+          <div className="space-y-8">
+            <ExpectedValueCalculator />
+            <RiskAnalysisChart />
+            <CapitalRequirementsTable />
+          </div>
         </div>
       </main>
 
