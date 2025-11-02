@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import { getRealData } from "@/lib/parseRealCSV";
 import { getBreakevenPoints } from "@/lib/parseBreakevenFromCSV";
 import { calculateExpectedCauseFundingAnalysis, ExpectedCauseAnalysis } from "@/lib/expectedCauseFunding";
+import { calculateCauseFundingByEntryPoint } from "@/lib/causeFundingAttribution";
 import { Loader2 } from "lucide-react";
 
 export const ExpectedCauseFundingChart = () => {
   const [data, setData] = useState<ExpectedCauseAnalysis[]>([]);
+  const [entry131Percentage, setEntry131Percentage] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -16,11 +18,12 @@ export const ExpectedCauseFundingChart = () => {
         const { mintingData } = await getRealData();
         const breakevenPoints = await getBreakevenPoints();
         const analysis = calculateExpectedCauseFundingAnalysis(mintingData, breakevenPoints);
+        const causeFunding = calculateCauseFundingByEntryPoint(mintingData, breakevenPoints);
         
-        // Log specific entry point for N=131
-        const entry131 = analysis.find(a => a.entryN === 131);
+        // Get specific entry point for N=131
+        const entry131 = causeFunding.find(cf => cf.entryN === 131);
         if (entry131) {
-          console.log(`Entry N=131: Breakeven at N=${entry131.breakevenN}, Breakeven Cause % = ${entry131.breakevenPercentage.toFixed(4)}%`);
+          setEntry131Percentage(entry131.percentage);
         }
         
         // Filter to every 10th entry for cleaner visualization
@@ -104,6 +107,11 @@ export const ExpectedCauseFundingChart = () => {
         </ResponsiveContainer>
         
         <div className="mt-4 space-y-2 text-sm text-muted-foreground">
+          {entry131Percentage !== null && (
+            <p className="text-base font-semibold text-foreground">
+              <strong>Entry at N=131:</strong> {entry131Percentage.toFixed(4)}% of total cause funding (if they win exactly at breakeven)
+            </p>
+          )}
           <p>
             <strong>Key Insight:</strong> A single investor mints continuously until winning the white square. 
             While most (63.2%) win within 256 mints with moderate cause contributions, 
