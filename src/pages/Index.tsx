@@ -13,6 +13,7 @@ import CapitalRequirementsTable from "@/components/charts/CapitalRequirementsTab
 import BreakevenCalculator from "@/components/charts/BreakevenCalculator";
 import { OptimalEntryHeatmap } from "@/components/charts/OptimalEntryHeatmap";
 import { CauseFundingAttributionChart } from "@/components/charts/CauseFundingAttributionChart";
+import { InvestorContributionProof } from "@/components/charts/InvestorContributionProof";
 import StatsCard from "@/components/charts/StatsCard";
 import { getRealData } from "@/lib/parseRealCSV";
 import type { MintData } from "@/lib/chartData";
@@ -128,6 +129,16 @@ const Index = () => {
             <RiskAnalysisChart />
             <CapitalRequirementsTable />
           </div>
+        </div>
+
+        {/* Statistical Proof Section */}
+        <div className="mt-16">
+          <h2 className="text-3xl font-bold mb-2">📈 Statistical Proof: Investor Contribution</h2>
+          <p className="text-muted-foreground mb-8">
+            Mathematical demonstration using binomial probability and bonding curve analysis
+          </p>
+          
+          <InvestorContributionProof />
         </div>
       </main>
 
