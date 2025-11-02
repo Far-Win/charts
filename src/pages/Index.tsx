@@ -29,16 +29,31 @@ const Index = () => {
       const data = await getRealData();
       setFullMintingData(data.mintingData);
       
-      // Load cause funding percentages
+      // Calculate specific scenario: Entry at N=113, win at N=256
+      const CAUSE_FEE = 0.2;
+      const entryN = 113;
+      const winN = 256;
+      
+      // Calculate cause contribution from entry to win
+      const causeContribution = data.mintingData
+        .filter(d => d.n >= entryN && d.n <= winN)
+        .reduce((sum, d) => sum + d.mintPrice * CAUSE_FEE, 0);
+      
+      // Calculate total cause funding
+      const totalCauseFunding = data.mintingData
+        .reduce((sum, d) => sum + d.contributionToCause, 0);
+      
+      const percentage113 = totalCauseFunding > 0 
+        ? (causeContribution / totalCauseFunding) * 100 
+        : 0;
+      
+      setEntry113Percentage(percentage113);
+      
+      // For N=131, keep the original calculation
       const { getBreakevenPoints } = await import("@/lib/parseBreakevenFromCSV");
       const { calculateCauseFundingByEntryPoint } = await import("@/lib/causeFundingAttribution");
       const breakevenPoints = await getBreakevenPoints();
       const causeFunding = calculateCauseFundingByEntryPoint(data.mintingData, breakevenPoints);
-      
-      const entry113 = causeFunding.find(cf => cf.entryN === 113);
-      if (entry113) {
-        setEntry113Percentage(entry113.percentage);
-      }
       
       const entry131 = causeFunding.find(cf => cf.entryN === 131);
       if (entry131) {
@@ -91,7 +106,7 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {entry113Percentage !== null && (
               <div className="p-4 bg-muted/50 rounded-lg">
-                <p className="text-sm text-muted-foreground mb-1">Entry at N=113 (Breakeven)</p>
+                <p className="text-sm text-muted-foreground mb-1">Entry at N=113, Win at N=256</p>
                 <p className="text-3xl font-bold text-primary">{entry113Percentage.toFixed(4)}%</p>
                 <p className="text-xs text-muted-foreground mt-1">of total cause funding</p>
               </div>
@@ -105,7 +120,7 @@ const Index = () => {
             )}
           </div>
           <p className="text-sm text-muted-foreground mt-4">
-            Percentage of total cause funding contributed if the investor wins white exactly at their breakeven point
+            Percentage of total cause funding contributed when investor enters at specified N and wins at breakeven point
           </p>
         </div>
 
