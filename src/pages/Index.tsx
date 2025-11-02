@@ -10,6 +10,7 @@ import ProfitableDurationChart from "@/components/charts/ProfitableDurationChart
 import ExpectedValueCalculator from "@/components/charts/ExpectedValueCalculator";
 import RiskAnalysisChart from "@/components/charts/RiskAnalysisChart";
 import CapitalRequirementsTable from "@/components/charts/CapitalRequirementsTable";
+import BreakevenCalculator from "@/components/charts/BreakevenCalculator";
 import StatsCard from "@/components/charts/StatsCard";
 import { getRealData } from "@/lib/parseRealCSV";
 import type { MintData } from "@/lib/chartData";
@@ -118,6 +119,7 @@ const Index = () => {
           </p>
           
           <div className="space-y-8">
+            <BreakevenCalculator />
             <ExpectedValueCalculator />
             <RiskAnalysisChart />
             <CapitalRequirementsTable />
