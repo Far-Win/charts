@@ -109,10 +109,9 @@ export const OptimalEntryHeatmap = () => {
   const heatmapData = useMemo(() => {
     if (data.length === 0) return [];
 
-    // Sample entry points every 10 mints starting from N=40
+    // Sample entry points every 10 mints from N=50 to N=500
     const entryPoints: number[] = [];
-    const maxN = data[data.length - 1]?.n || 999;
-    for (let n = 40; n <= maxN; n += 10) {
+    for (let n = 50; n <= 500; n += 10) {
       if (data.find(d => d.n === n)) {
         entryPoints.push(n);
       }
