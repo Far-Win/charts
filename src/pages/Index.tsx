@@ -21,12 +21,34 @@ import type { MintData } from "@/lib/chartData";
 const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [fullMintingData, setFullMintingData] = useState<MintData[]>([]);
+  const [entry113Percentage, setEntry113Percentage] = useState<number | null>(null);
+  const [entry131Percentage, setEntry131Percentage] = useState<number | null>(null);
 
   useEffect(() => {
-    getRealData().then(data => {
+    const loadData = async () => {
+      const data = await getRealData();
       setFullMintingData(data.mintingData);
+      
+      // Load cause funding percentages
+      const { getBreakevenPoints } = await import("@/lib/parseBreakevenFromCSV");
+      const { calculateCauseFundingByEntryPoint } = await import("@/lib/causeFundingAttribution");
+      const breakevenPoints = await getBreakevenPoints();
+      const causeFunding = calculateCauseFundingByEntryPoint(data.mintingData, breakevenPoints);
+      
+      const entry113 = causeFunding.find(cf => cf.entryN === 113);
+      if (entry113) {
+        setEntry113Percentage(entry113.percentage);
+      }
+      
+      const entry131 = causeFunding.find(cf => cf.entryN === 131);
+      if (entry131) {
+        setEntry131Percentage(entry131.percentage);
+      }
+      
       setIsLoading(false);
-    });
+    };
+    
+    loadData();
   }, []);
 
   if (isLoading || fullMintingData.length === 0) {
@@ -63,6 +85,30 @@ const Index = () => {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
+        {/* Key Entry Point Statistics */}
+        <div className="mb-8 p-6 bg-card border border-border rounded-lg shadow-lg">
+          <h2 className="text-2xl font-bold mb-4">🎯 Key Entry Point Analysis</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {entry113Percentage !== null && (
+              <div className="p-4 bg-muted/50 rounded-lg">
+                <p className="text-sm text-muted-foreground mb-1">Entry at N=113 (Breakeven)</p>
+                <p className="text-3xl font-bold text-primary">{entry113Percentage.toFixed(4)}%</p>
+                <p className="text-xs text-muted-foreground mt-1">of total cause funding</p>
+              </div>
+            )}
+            {entry131Percentage !== null && (
+              <div className="p-4 bg-muted/50 rounded-lg">
+                <p className="text-sm text-muted-foreground mb-1">Entry at N=131 (Breakeven)</p>
+                <p className="text-3xl font-bold text-primary">{entry131Percentage.toFixed(4)}%</p>
+                <p className="text-xs text-muted-foreground mt-1">of total cause funding</p>
+              </div>
+            )}
+          </div>
+          <p className="text-sm text-muted-foreground mt-4">
+            Percentage of total cause funding contributed if the investor wins white exactly at their breakeven point
+          </p>
+        </div>
+
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatsCard
