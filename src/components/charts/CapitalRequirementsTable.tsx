@@ -30,8 +30,8 @@ const CapitalRequirementsTable = () => {
     );
   }
 
-  const formatCurrency = (value: number) => `$${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
   const formatETH = (value: number) => `${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETH`;
+  const formatPercent = (value: number) => `${value.toFixed(1)}%`;
 
   return (
     <Card>
@@ -64,19 +64,19 @@ const CapitalRequirementsTable = () => {
                     <TableCell className="font-medium">{risk.entryN}</TableCell>
                     <TableCell className="text-right">{formatETH(risk.poolSizeAtEntry)}</TableCell>
                     <TableCell className={`text-right font-medium ${risk.expectedProfit > 0 ? 'text-chart-4' : 'text-destructive'}`}>
-                      {formatCurrency(risk.expectedProfit)}
+                      {formatETH(risk.expectedProfit)}
                     </TableCell>
                     <TableCell className="text-right text-muted-foreground">
-                      {formatCurrency(risk.percentile50Capital)}
+                      {formatETH(risk.percentile50Capital)}
                     </TableCell>
                     <TableCell className="text-right font-medium">
-                      {formatCurrency(risk.percentile90Capital)}
+                      {formatETH(risk.percentile90Capital)}
                     </TableCell>
                     <TableCell className="text-right text-muted-foreground">
-                      {formatCurrency(risk.percentile99Capital)}
+                      {formatETH(risk.percentile99Capital)}
                     </TableCell>
                     <TableCell className={`text-right font-medium ${roi90 > 0 ? 'text-chart-4' : 'text-destructive'}`}>
-                      {roi90.toFixed(1)}%
+                      {formatPercent(roi90)}
                     </TableCell>
                   </TableRow>
                 );

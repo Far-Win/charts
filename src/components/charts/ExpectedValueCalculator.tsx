@@ -35,7 +35,6 @@ const ExpectedValueCalculator = () => {
 
   if (!selected) return null;
 
-  const formatCurrency = (value: number) => `$${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
   const formatETH = (value: number) => `${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETH`;
 
   return (
@@ -77,13 +76,13 @@ const ExpectedValueCalculator = () => {
 
           <div className="space-y-2 p-4 rounded-lg bg-muted/50">
             <div className="text-sm text-muted-foreground">Expected Cost (20% Fee)</div>
-            <div className="text-2xl font-bold text-destructive">{formatCurrency(selected.expectedCost)}</div>
+            <div className="text-2xl font-bold text-destructive">{formatETH(selected.expectedCost)}</div>
           </div>
 
           <div className="space-y-2 p-4 rounded-lg bg-muted/50">
             <div className="text-sm text-muted-foreground">Expected Profit</div>
             <div className={`text-2xl font-bold ${selected.expectedProfit > 0 ? 'text-chart-4' : 'text-destructive'}`}>
-              {formatCurrency(selected.expectedProfit)}
+              {formatETH(selected.expectedProfit)}
             </div>
           </div>
         </div>
@@ -93,17 +92,17 @@ const ExpectedValueCalculator = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
             <div className="p-3 rounded bg-background border">
               <div className="text-muted-foreground mb-1">50th Percentile</div>
-              <div className="font-bold">{formatCurrency(selected.percentile50Capital)}</div>
+              <div className="font-bold">{formatETH(selected.percentile50Capital)}</div>
               <div className="text-xs text-muted-foreground mt-1">177 mints</div>
             </div>
             <div className="p-3 rounded bg-background border">
               <div className="text-muted-foreground mb-1">90th Percentile</div>
-              <div className="font-bold">{formatCurrency(selected.percentile90Capital)}</div>
+              <div className="font-bold">{formatETH(selected.percentile90Capital)}</div>
               <div className="text-xs text-muted-foreground mt-1">589 mints</div>
             </div>
             <div className="p-3 rounded bg-background border">
               <div className="text-muted-foreground mb-1">99th Percentile</div>
-              <div className="font-bold">{formatCurrency(selected.percentile99Capital)}</div>
+              <div className="font-bold">{formatETH(selected.percentile99Capital)}</div>
               <div className="text-xs text-muted-foreground mt-1">1,177 mints</div>
             </div>
           </div>
