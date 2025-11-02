@@ -30,18 +30,18 @@ const Index = () => {
       setFullMintingData(data.mintingData);
       
       // Calculate specific scenario: Entry at N=113, win at N=256
-      const CAUSE_FEE = 0.2;
       const entryN = 113;
       const winN = 256;
       
-      // Calculate cause contribution from investor (20% of their mint prices)
+      // Investor's cause contribution (20% of their mint prices)
       const investorCauseContribution = data.mintingData
         .filter(d => d.n >= entryN && d.n <= winN)
-        .reduce((sum, d) => sum + d.mintPrice * CAUSE_FEE, 0);
+        .reduce((sum, d) => sum + d.contributionToCause, 0);
       
-      // Total cause funding at N=256 is 20% of the pool size at N=256
-      const poolAtWin = data.mintingData.find(d => d.n === winN)?.poolSize || 0;
-      const totalCauseFunding = poolAtWin * CAUSE_FEE;
+      // Total cause funding from ALL players up to N=256
+      const totalCauseFunding = data.mintingData
+        .filter(d => d.n <= winN)
+        .reduce((sum, d) => sum + d.contributionToCause, 0);
       
       const percentage113 = totalCauseFunding > 0 
         ? (investorCauseContribution / totalCauseFunding) * 100 
