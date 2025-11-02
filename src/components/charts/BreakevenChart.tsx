@@ -124,6 +124,15 @@ const BreakevenChart = () => {
               strokeWidth={2}
             />
             
+            {/* N=256 reference line */}
+            <ReferenceLine
+              x={256}
+              stroke="hsl(var(--chart-3))"
+              strokeDasharray="5 5"
+              strokeWidth={2}
+              label={{ value: 'N=256', position: 'top', fill: 'hsl(var(--chart-3))' }}
+            />
+            
             {/* Draw lines for selected investors */}
             {selectedInvestors.map((investor, index) => (
               <Line
