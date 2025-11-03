@@ -44,7 +44,7 @@ const BreakevenChart = () => {
     investorLines.forEach(investor => {
       const profitPoint = investor.profitData.find(p => p.n === n);
       if (profitPoint) {
-        dataPoint[`investor_${investor.investorNumber}`] = profitPoint.profit;
+        dataPoint[`entry_${investor.entryPoint}`] = profitPoint.profit;
       }
     });
     return dataPoint;
@@ -130,13 +130,13 @@ const BreakevenChart = () => {
             {/* Draw lines for selected investors */}
             {selectedInvestors.map((investor, index) => (
               <Line
-                key={`investor_${investor.investorNumber}`}
+                key={`entry_${investor.entryPoint}`}
                 type="monotone"
-                dataKey={`investor_${investor.investorNumber}`}
+                dataKey={`entry_${investor.entryPoint}`}
                 stroke={colors[index % colors.length]}
                 strokeWidth={2}
                 dot={false}
-                name={`Investor ${investor.investorNumber}`}
+                name={`Entry ${investor.entryPoint}`}
               />
             ))}
           </LineChart>

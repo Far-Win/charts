@@ -5,6 +5,7 @@ export interface InvestorDataPoint {
 
 export interface InvestorLine {
   investorNumber: number;
+  entryPoint: number;
   profitData: InvestorDataPoint[];
 }
 
@@ -58,8 +59,11 @@ const parseCSVData = (csvText: string): InvestorLine[] => {
   for (let investorNum = 1; investorNum <= NUM_INVESTORS; investorNum++) {
     const profitData = investorMap.get(investorNum) || [];
     if (profitData.length > 0) {
+      // Entry point is the N value of the first data point
+      const entryPoint = profitData[0].n;
       investorLines.push({
         investorNumber: investorNum,
+        entryPoint,
         profitData,
       });
     }
