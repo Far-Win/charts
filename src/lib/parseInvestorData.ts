@@ -59,21 +59,8 @@ const parseCSVData = (csvText: string): InvestorLine[] => {
   for (let investorNum = 1; investorNum <= NUM_INVESTORS; investorNum++) {
     const profitData = investorMap.get(investorNum) || [];
     if (profitData.length > 0) {
-      // Find the actual entry point (where profit crosses from positive to negative, closest to zero)
-      let entryPoint = profitData[0].n; // Default to first data point
-      
-      for (let i = 0; i < profitData.length - 1; i++) {
-        const current = profitData[i];
-        const next = profitData[i + 1];
-        
-        // Find where profit crosses from positive to negative (entry point)
-        if (current.profit >= 0 && next.profit < 0) {
-          // Use the point closest to zero as entry point
-          entryPoint = Math.abs(current.profit) < Math.abs(next.profit) ? current.n : next.n;
-          break;
-        }
-      }
-      
+      // Entry point is the N value of the first data point
+      const entryPoint = profitData[0].n;
       investorLines.push({
         investorNumber: investorNum,
         entryPoint,
