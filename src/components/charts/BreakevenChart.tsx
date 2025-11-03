@@ -16,7 +16,13 @@ const CustomTooltip = ({ active, payload, investorMetadata }: TooltipProps<numbe
   if (!active || !payload || payload.length === 0) return null;
 
   const currentN = payload[0].payload.n;
-  const entry = payload[0]; // Only show the first/active line
+  
+  // Filter to only show lines that have data at this point (non-null values)
+  const validEntries = payload.filter(entry => entry.value !== null && entry.value !== undefined);
+  if (validEntries.length === 0) return null;
+  
+  // Show the first valid entry
+  const entry = validEntries[0];
   const entryPoint = parseInt(entry.dataKey?.toString().replace('entry_', '') || '0');
   const metadata = investorMetadata.get(entryPoint);
   
