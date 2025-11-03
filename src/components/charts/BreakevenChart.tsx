@@ -16,42 +16,36 @@ const CustomTooltip = ({ active, payload, investorMetadata }: TooltipProps<numbe
   if (!active || !payload || payload.length === 0) return null;
 
   const currentN = payload[0].payload.n;
+  const entry = payload[0]; // Only show the first/active line
+  const entryPoint = parseInt(entry.dataKey?.toString().replace('entry_', '') || '0');
+  const metadata = investorMetadata.get(entryPoint);
   
   return (
     <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
       <p className="font-semibold mb-2">N = {currentN}</p>
-      {payload.map((entry, index) => {
-        const entryPoint = parseInt(entry.dataKey?.toString().replace('entry_', '') || '0');
-        const metadata = investorMetadata.get(entryPoint);
-        
-        return (
-          <div key={index} className="mb-2 pb-2 border-b border-border last:border-0 last:mb-0 last:pb-0">
-            <div className="flex items-center gap-2 mb-1">
-              <div 
-                className="w-3 h-3 rounded-full" 
-                style={{ backgroundColor: entry.color }}
-              />
-              <span className="font-medium">Entry {entryPoint}</span>
-            </div>
-            <div className="text-sm space-y-0.5 ml-5">
-              <p>Profit/Loss: {entry.value?.toFixed(4)} ETH</p>
-              {metadata && (
-                <>
-                  {metadata.playsToBreakeven !== null && (
-                    <p>Plays to breakeven: {metadata.playsToBreakeven}</p>
-                  )}
-                  {metadata.realCost !== null && (
-                    <p>Real cost to breakeven: {metadata.realCost.toFixed(4)} ETH</p>
-                  )}
-                  {metadata.playsToBreakeven === null && (
-                    <p className="text-muted-foreground">No breakeven reached</p>
-                  )}
-                </>
-              )}
-            </div>
-          </div>
-        );
-      })}
+      <div className="flex items-center gap-2 mb-1">
+        <div 
+          className="w-3 h-3 rounded-full" 
+          style={{ backgroundColor: entry.color }}
+        />
+        <span className="font-medium">Entry {entryPoint}</span>
+      </div>
+      <div className="text-sm space-y-0.5 ml-5">
+        <p>Profit/Loss: {entry.value?.toFixed(4)} ETH</p>
+        {metadata && (
+          <>
+            {metadata.playsToBreakeven !== null && (
+              <p>Plays to breakeven: {metadata.playsToBreakeven}</p>
+            )}
+            {metadata.realCost !== null && (
+              <p>Real cost to breakeven: {metadata.realCost.toFixed(4)} ETH</p>
+            )}
+            {metadata.playsToBreakeven === null && (
+              <p className="text-muted-foreground">No breakeven reached</p>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 };
