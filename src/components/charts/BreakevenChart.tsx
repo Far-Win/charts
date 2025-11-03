@@ -1,15 +1,118 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ReferenceLine } from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ReferenceLine, TooltipProps } from "recharts";
 import { getInvestorData, type InvestorLine } from "@/lib/parseInvestorData";
+import { getRealData } from "@/lib/parseRealCSV";
+import { MintData } from "@/lib/chartData";
+
+interface InvestorMetadata {
+  entryPoint: number;
+  breakevenN: number | null;
+  playsToBreakeven: number | null;
+  realCost: number | null;
+}
+
+const CustomTooltip = ({ active, payload, investorMetadata }: TooltipProps<number, string> & { investorMetadata: Map<number, InvestorMetadata> }) => {
+  if (!active || !payload || payload.length === 0) return null;
+
+  const currentN = payload[0].payload.n;
+  
+  return (
+    <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
+      <p className="font-semibold mb-2">N = {currentN}</p>
+      {payload.map((entry, index) => {
+        const entryPoint = parseInt(entry.dataKey?.toString().replace('entry_', '') || '0');
+        const metadata = investorMetadata.get(entryPoint);
+        
+        return (
+          <div key={index} className="mb-2 pb-2 border-b border-border last:border-0 last:mb-0 last:pb-0">
+            <div className="flex items-center gap-2 mb-1">
+              <div 
+                className="w-3 h-3 rounded-full" 
+                style={{ backgroundColor: entry.color }}
+              />
+              <span className="font-medium">Entry {entryPoint}</span>
+            </div>
+            <div className="text-sm space-y-0.5 ml-5">
+              <p>Profit/Loss: {entry.value?.toFixed(4)} ETH</p>
+              {metadata && (
+                <>
+                  {metadata.playsToBreakeven !== null && (
+                    <p>Plays to breakeven: {metadata.playsToBreakeven}</p>
+                  )}
+                  {metadata.realCost !== null && (
+                    <p>Real cost to breakeven: {metadata.realCost.toFixed(4)} ETH</p>
+                  )}
+                  {metadata.playsToBreakeven === null && (
+                    <p className="text-muted-foreground">No breakeven reached</p>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
 
 const BreakevenChart = () => {
   const [investorLines, setInvestorLines] = useState<InvestorLine[]>([]);
+  const [mintingData, setMintingData] = useState<MintData[]>([]);
+  const [investorMetadata, setInvestorMetadata] = useState<Map<number, InvestorMetadata>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    getInvestorData().then(lines => {
+    Promise.all([getInvestorData(), getRealData()]).then(([lines, realData]) => {
       setInvestorLines(lines);
+      setMintingData(realData.mintingData);
+      
+      // Calculate metadata for each investor
+      const metadata = new Map<number, InvestorMetadata>();
+      
+      lines.forEach(investor => {
+        const entryPoint = investor.entryPoint;
+        
+        // Find breakeven point (where profit crosses from positive to negative)
+        let breakevenN: number | null = null;
+        for (let i = 0; i < investor.profitData.length - 1; i++) {
+          const current = investor.profitData[i];
+          const next = investor.profitData[i + 1];
+          
+          // Check if we cross zero from positive to negative
+          if (current.profit > 0 && next.profit <= 0) {
+            breakevenN = next.n;
+            break;
+          }
+        }
+        
+        let playsToBreakeven: number | null = null;
+        let realCost: number | null = null;
+        
+        if (breakevenN !== null) {
+          playsToBreakeven = breakevenN - entryPoint;
+          
+          // Calculate real cost (20% of mint prices = contribution to cause)
+          const entryIndex = realData.mintingData.findIndex(d => d.n === entryPoint);
+          const breakevenIndex = realData.mintingData.findIndex(d => d.n === breakevenN);
+          
+          if (entryIndex !== -1 && breakevenIndex !== -1) {
+            realCost = 0;
+            for (let i = entryIndex; i < breakevenIndex; i++) {
+              realCost += realData.mintingData[i].contributionToCause;
+            }
+          }
+        }
+        
+        metadata.set(entryPoint, {
+          entryPoint,
+          breakevenN,
+          playsToBreakeven,
+          realCost,
+        });
+      });
+      
+      setInvestorMetadata(metadata);
       setIsLoading(false);
     });
   }, []);
@@ -102,11 +205,7 @@ const BreakevenChart = () => {
               allowDataOverflow={true}
             />
             <Tooltip 
-              contentStyle={{ 
-                backgroundColor: 'hsl(var(--card))',
-                border: '1px solid hsl(var(--border))',
-                borderRadius: 'var(--radius)',
-              }}
+              content={<CustomTooltip investorMetadata={investorMetadata} />}
             />
             <Legend />
             
