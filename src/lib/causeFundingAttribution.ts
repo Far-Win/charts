@@ -18,20 +18,24 @@ export const calculateCauseFundingByEntryPoint = (
   mintingData: MintData[],
   breakevenPoints: BreakevenPoint[]
 ): CauseFundingAttribution[] => {
-  // Find the maximum breakeven point to determine the scope of analysis
-  const maxBreakeven = Math.max(
-    ...breakevenPoints
-      .filter(bp => bp.breakevenN !== null)
-      .map(bp => bp.breakevenN as number)
+  // Filter to only entry points 110-200
+  const filteredBreakevenPoints = breakevenPoints.filter(
+    bp => bp.entryN >= 110 && bp.entryN <= 200
   );
 
-  // Calculate total cause funding up to the maximum breakeven point
-  const totalCauseFunding = mintingData
-    .filter(d => d.n <= maxBreakeven)
-    .reduce((sum, d) => sum + d.contributionToCause, 0);
+  // Calculate total cause funding from all investors entering at 110-200
+  let totalCauseFunding = 0;
+  filteredBreakevenPoints.forEach(bp => {
+    if (bp.breakevenN !== null) {
+      const contribution = mintingData
+        .filter(d => d.n >= bp.entryN && d.n <= bp.breakevenN!)
+        .reduce((sum, d) => sum + d.mintPrice * CAUSE_FEE, 0);
+      totalCauseFunding += contribution;
+    }
+  });
 
   // For each entry point, calculate their contribution to the cause
-  const attributions: CauseFundingAttribution[] = breakevenPoints.map(bp => {
+  const attributions: CauseFundingAttribution[] = filteredBreakevenPoints.map(bp => {
     if (bp.breakevenN === null) {
       return {
         entryN: bp.entryN,
