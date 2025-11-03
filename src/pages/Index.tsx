@@ -9,11 +9,8 @@ import BreakevenPointChart from "@/components/charts/BreakevenPointChart";
 import ProfitableDurationChart from "@/components/charts/ProfitableDurationChart";
 import ExpectedValueCalculator from "@/components/charts/ExpectedValueCalculator";
 import RiskAnalysisChart from "@/components/charts/RiskAnalysisChart";
-import CapitalRequirementsTable from "@/components/charts/CapitalRequirementsTable";
 import BreakevenCalculator from "@/components/charts/BreakevenCalculator";
 import { OptimalEntryHeatmap } from "@/components/charts/OptimalEntryHeatmap";
-import { CauseFundingAttributionChart } from "@/components/charts/CauseFundingAttributionChart";
-import { ExpectedCauseFundingChart } from "@/components/charts/ExpectedCauseFundingChart";
 import StatsCard from "@/components/charts/StatsCard";
 import { getRealData } from "@/lib/parseRealCSV";
 import type { MintData } from "@/lib/chartData";
@@ -21,45 +18,11 @@ import type { MintData } from "@/lib/chartData";
 const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [fullMintingData, setFullMintingData] = useState<MintData[]>([]);
-  const [entry113Percentage, setEntry113Percentage] = useState<number | null>(null);
-  const [entry131Percentage, setEntry131Percentage] = useState<number | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
       const data = await getRealData();
       setFullMintingData(data.mintingData);
-      
-      // Calculate specific scenario: Entry at N=113, win at N=256
-      const entryN = 113;
-      const winN = 256;
-      
-      // Investor's cause contribution (20% of their mint prices)
-      const investorCauseContribution = data.mintingData
-        .filter(d => d.n >= entryN && d.n <= winN)
-        .reduce((sum, d) => sum + d.contributionToCause, 0);
-      
-      // Total cause funding from ALL players up to N=256
-      const totalCauseFunding = data.mintingData
-        .filter(d => d.n <= winN)
-        .reduce((sum, d) => sum + d.contributionToCause, 0);
-      
-      const percentage113 = totalCauseFunding > 0 
-        ? (investorCauseContribution / totalCauseFunding) * 100 
-        : 0;
-      
-      setEntry113Percentage(percentage113);
-      
-      // For N=131, keep the original calculation
-      const { getBreakevenPoints } = await import("@/lib/parseBreakevenFromCSV");
-      const { calculateCauseFundingByEntryPoint } = await import("@/lib/causeFundingAttribution");
-      const breakevenPoints = await getBreakevenPoints();
-      const causeFunding = calculateCauseFundingByEntryPoint(data.mintingData, breakevenPoints);
-      
-      const entry131 = causeFunding.find(cf => cf.entryN === 131);
-      if (entry131) {
-        setEntry131Percentage(entry131.percentage);
-      }
-      
       setIsLoading(false);
     };
     
@@ -100,30 +63,6 @@ const Index = () => {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
-        {/* Key Entry Point Statistics */}
-        <div className="mb-8 p-6 bg-card border border-border rounded-lg shadow-lg">
-          <h2 className="text-2xl font-bold mb-4">🎯 Key Entry Point Analysis</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {entry113Percentage !== null && (
-              <div className="p-4 bg-muted/50 rounded-lg">
-                <p className="text-sm text-muted-foreground mb-1">Entry at N=113, Win at N=256</p>
-                <p className="text-3xl font-bold text-primary">{entry113Percentage.toFixed(4)}%</p>
-                <p className="text-xs text-muted-foreground mt-1">of total cause funding</p>
-              </div>
-            )}
-            {entry131Percentage !== null && (
-              <div className="p-4 bg-muted/50 rounded-lg">
-                <p className="text-sm text-muted-foreground mb-1">Entry at N=131 (Breakeven)</p>
-                <p className="text-3xl font-bold text-primary">{entry131Percentage.toFixed(4)}%</p>
-                <p className="text-xs text-muted-foreground mt-1">of total cause funding</p>
-              </div>
-            )}
-          </div>
-          <p className="text-sm text-muted-foreground mt-4">
-            Percentage of total cause funding contributed when investor enters at specified N and wins at breakeven point
-          </p>
-        </div>
-
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatsCard
@@ -184,12 +123,9 @@ const Index = () => {
           
           <div className="space-y-8">
             <OptimalEntryHeatmap />
-            <CauseFundingAttributionChart />
-            <ExpectedCauseFundingChart />
             <BreakevenCalculator />
             <ExpectedValueCalculator />
             <RiskAnalysisChart />
-            <CapitalRequirementsTable />
           </div>
         </div>
       </main>
