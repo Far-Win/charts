@@ -1,26 +1,26 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ReferenceLine } from "recharts";
-import { getInvestorProfitLines, type InvestorProfitLine } from "@/lib/parseBreakevenFromCSV";
+import { getInvestorData, type InvestorLine } from "@/lib/parseInvestorData";
 
 const BreakevenChart = () => {
-  const [investorProfitLines, setInvestorProfitLines] = useState<InvestorProfitLine[]>([]);
+  const [investorLines, setInvestorLines] = useState<InvestorLine[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    getInvestorProfitLines().then(lines => {
-      setInvestorProfitLines(lines);
+    getInvestorData().then(lines => {
+      setInvestorLines(lines);
       setIsLoading(false);
     });
   }, []);
 
-  if (isLoading || investorProfitLines.length === 0) {
+  if (isLoading || investorLines.length === 0) {
     return (
       <Card className="shadow-glow border-border/50">
         <CardHeader>
         <CardTitle className="text-2xl">Investor Profit/Loss Analysis</CardTitle>
         <CardDescription>
-          21 investor scenarios entering at n=10, 30, 50, ... 410 (every 20 mints)
+          Investor profit/loss scenarios (Investors 1, 3, 6-18)
         </CardDescription>
         </CardHeader>
         <CardContent>
@@ -38,22 +38,22 @@ const BreakevenChart = () => {
   // Create a combined dataset with all investor profit lines
   // Each investor's data needs to be merged into rows by N value
   const allNValues = new Set<number>();
-  investorProfitLines.forEach(investor => {
+  investorLines.forEach(investor => {
     investor.profitData.forEach(point => allNValues.add(point.n));
   });
 
   const chartData = Array.from(allNValues).sort((a, b) => a - b).map(n => {
     const dataPoint: any = { n };
-    investorProfitLines.forEach(investor => {
+    investorLines.forEach(investor => {
       const profitPoint = investor.profitData.find(p => p.n === n);
       if (profitPoint) {
-        dataPoint[`investor_${investor.entryN}`] = profitPoint.profit;
+        dataPoint[`investor_${investor.investorNumber}`] = profitPoint.profit;
       }
     });
     return dataPoint;
   });
 
-  // Generate distinct colors for all 21 investor lines
+  // Generate distinct colors for all investor lines
   const colors = [
     "hsl(var(--chart-1))",
     "hsl(var(--chart-2))",
@@ -73,20 +73,17 @@ const BreakevenChart = () => {
     "#fb923c", // orange
     "#22d3ee", // sky
     "#4ade80", // green
-    "#facc15", // yellow
-    "#e11d48", // red
-    "#7c3aed", // purple variant
   ];
 
-  // Show ALL 21 investor lines
-  const selectedInvestors = investorProfitLines;
+  // Show all investor lines
+  const selectedInvestors = investorLines;
 
   return (
     <Card className="shadow-glow border-border/50">
       <CardHeader>
         <CardTitle className="text-2xl">Investor Profit/Loss Analysis</CardTitle>
         <CardDescription>
-          21 investor scenarios entering at n=10, 30, 50, ... 410 (every 20 mints)
+          Investor profit/loss scenarios (Investors 1, 3, 6-18)
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -136,19 +133,19 @@ const BreakevenChart = () => {
             {/* Draw lines for selected investors */}
             {selectedInvestors.map((investor, index) => (
               <Line
-                key={`investor_${investor.entryN}`}
+                key={`investor_${investor.investorNumber}`}
                 type="monotone"
-                dataKey={`investor_${investor.entryN}`}
+                dataKey={`investor_${investor.investorNumber}`}
                 stroke={colors[index % colors.length]}
                 strokeWidth={2}
                 dot={false}
-                name={`Entry N=${investor.entryN}`}
+                name={`Investor ${investor.investorNumber}`}
               />
             ))}
           </LineChart>
         </ResponsiveContainer>
         <div className="mt-4 text-sm text-muted-foreground">
-          <p>All 21 investor scenarios entering every 20 mints (n=10, 30, 50, ... 410). Each line shows profit declining as minting continues. Breakeven occurs when crossing zero into negative territory.</p>
+          <p>Multiple investor scenarios showing profit/loss over time. Each line represents a different investor entering at various points. Breakeven occurs when crossing zero into negative territory.</p>
         </div>
       </CardContent>
     </Card>
