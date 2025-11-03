@@ -18,10 +18,7 @@ const BreakevenChart = () => {
     return (
       <Card className="shadow-glow border-border/50">
         <CardHeader>
-        <CardTitle className="text-2xl">Investor Profit/Loss Analysis</CardTitle>
-        <CardDescription>
-          Investor profit/loss scenarios (Investors 1, 3, 6-18)
-        </CardDescription>
+        <CardTitle className="text-2xl">Fund Profit/Loss depending on entry point</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center h-[1200px]">
@@ -81,10 +78,7 @@ const BreakevenChart = () => {
   return (
     <Card className="shadow-glow border-border/50">
       <CardHeader>
-        <CardTitle className="text-2xl">Investor Profit/Loss Analysis</CardTitle>
-        <CardDescription>
-          Investor profit/loss scenarios (Investors 1, 3, 6-18)
-        </CardDescription>
+        <CardTitle className="text-2xl">Fund Profit/Loss depending on entry point</CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={1200}>
@@ -148,7 +142,7 @@ const BreakevenChart = () => {
           </LineChart>
         </ResponsiveContainer>
         <div className="mt-4 text-sm text-muted-foreground">
-          <p>Multiple investor scenarios showing profit/loss over time. Each line represents a different investor entering at various points. Breakeven occurs when crossing zero into negative territory.</p>
+          <p>Multiple scenarios showing fund profit/loss depending on game entry point. Each line represents a different investor entering at various points. Breakeven occurs when crossing zero into negative territory.</p>
         </div>
       </CardContent>
     </Card>
