@@ -21,36 +21,42 @@ const CustomTooltip = ({ active, payload, investorMetadata }: TooltipProps<numbe
   const validEntries = payload.filter(entry => entry.value !== null && entry.value !== undefined);
   if (validEntries.length === 0) return null;
   
-  // Show the first valid entry
-  const entry = validEntries[0];
-  const entryPoint = parseInt(entry.dataKey?.toString().replace('entry_', '') || '0');
-  const metadata = investorMetadata.get(entryPoint);
-  
   return (
     <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
       <p className="font-semibold mb-2">N = {currentN}</p>
-      <div className="flex items-center gap-2 mb-1">
-        <div 
-          className="w-3 h-3 rounded-full" 
-          style={{ backgroundColor: entry.color }}
-        />
-        <span className="font-medium">Entry {entryPoint}</span>
-      </div>
-      <div className="text-sm space-y-0.5 ml-5">
-        <p>Profit/Loss: {entry.value?.toFixed(4)} ETH</p>
-        {metadata && (
-          <>
-            {metadata.playsToBreakeven !== null && (
-              <p>Plays to breakeven: {metadata.playsToBreakeven}</p>
-            )}
-            {metadata.realCost !== null && (
-              <p>Real cost to breakeven: {metadata.realCost.toFixed(4)} ETH</p>
-            )}
-            {metadata.playsToBreakeven === null && (
-              <p className="text-muted-foreground">No breakeven reached</p>
-            )}
-          </>
-        )}
+      <div className="space-y-3">
+        {validEntries.map((entry, idx) => {
+          const entryPoint = parseInt(entry.dataKey?.toString().replace('entry_', '') || '0');
+          const metadata = investorMetadata.get(entryPoint);
+          
+          return (
+            <div key={idx} className="border-t first:border-0 pt-2 first:pt-0">
+              <div className="flex items-center gap-2 mb-1">
+                <div 
+                  className="w-3 h-3 rounded-full" 
+                  style={{ backgroundColor: entry.color }}
+                />
+                <span className="font-medium">Entry {entryPoint}</span>
+              </div>
+              <div className="text-sm space-y-0.5 ml-5">
+                <p>Profit/Loss: {entry.value?.toFixed(4)} ETH</p>
+                {metadata && (
+                  <>
+                    {metadata.playsToBreakeven !== null && (
+                      <p>Plays to breakeven: {metadata.playsToBreakeven}</p>
+                    )}
+                    {metadata.realCost !== null && (
+                      <p>Real cost to breakeven: {metadata.realCost.toFixed(4)} ETH</p>
+                    )}
+                    {metadata.playsToBreakeven === null && (
+                      <p className="text-muted-foreground">No breakeven reached</p>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
