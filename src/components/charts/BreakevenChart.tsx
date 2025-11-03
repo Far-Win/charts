@@ -97,12 +97,13 @@ const BreakevenChart = () => {
               dataKey="n"
               stroke="hsl(var(--muted-foreground))"
               label={{ value: 'Mint Number (N)', position: 'insideBottom', offset: -10, fill: 'hsl(var(--muted-foreground))' }}
-              domain={[11, 'dataMax']}
+              domain={[100, 500]}
               type="number"
             />
             <YAxis
               stroke="hsl(var(--muted-foreground))"
               label={{ value: 'Profit/Loss (ETH)', angle: -90, position: 'insideLeft', fill: 'hsl(var(--muted-foreground))' }}
+              domain={[-1, 2]}
             />
             <Tooltip 
               contentStyle={{ 
