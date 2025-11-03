@@ -73,16 +73,20 @@ const BreakevenChart = () => {
       lines.forEach(investor => {
         const entryPoint = investor.entryPoint;
         
-        // Find breakeven point (where profit crosses from positive to negative)
+        // Find breakeven point (where profit crosses from negative/zero to positive)
+        // Only look at data points after the investor's entry point
         let breakevenN: number | null = null;
         for (let i = 0; i < investor.profitData.length - 1; i++) {
           const current = investor.profitData[i];
           const next = investor.profitData[i + 1];
           
-          // Check if we cross zero from positive to negative
-          if (current.profit > 0 && next.profit <= 0) {
-            breakevenN = next.n;
-            break;
+          // Only check points at or after entry
+          if (current.n >= entryPoint) {
+            // Check if we cross zero from negative/zero to positive (initial breakeven)
+            if (current.profit <= 0 && next.profit > 0) {
+              breakevenN = next.n;
+              break;
+            }
           }
         }
         
