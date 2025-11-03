@@ -4,6 +4,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { getInvestorData, type InvestorLine } from "@/lib/parseInvestorData";
 import { getRealData } from "@/lib/parseRealCSV";
 import { MintData } from "@/lib/chartData";
+import { Button } from "@/components/ui/button";
 
 interface InvestorMetadata {
   entryPoint: number;
@@ -69,63 +70,48 @@ const BreakevenChart = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([getInvestorData(), getRealData()]).then(([lines, realData]) => {
-      setInvestorLines(lines);
-      setMintingData(realData.mintingData);
-      
-      // Calculate metadata for each investor
-      const metadata = new Map<number, InvestorMetadata>();
-      
-      lines.forEach(investor => {
-        const entryPoint = investor.entryPoint;
-        
-        // Find breakeven point (where profit crosses from negative/zero to positive)
-        // Only look at data points after the investor's entry point
-        let breakevenN: number | null = null;
-        for (let i = 0; i < investor.profitData.length - 1; i++) {
-          const current = investor.profitData[i];
-          const next = investor.profitData[i + 1];
-          
-          // Only check points at or after entry
-          if (current.n >= entryPoint) {
-            // Check if we cross zero from negative/zero to positive (initial breakeven)
-            if (current.profit <= 0 && next.profit > 0) {
-              breakevenN = next.n;
-              break;
-            }
-          }
-        }
-        
-        let playsToBreakeven: number | null = null;
-        let realCost: number | null = null;
-        
-        if (breakevenN !== null) {
-          playsToBreakeven = breakevenN - entryPoint;
-          
-          // Calculate real cost (20% of mint prices = contribution to cause)
-          const entryIndex = realData.mintingData.findIndex(d => d.n === entryPoint);
-          const breakevenIndex = realData.mintingData.findIndex(d => d.n === breakevenN);
-          
-          if (entryIndex !== -1 && breakevenIndex !== -1) {
-            realCost = 0;
-            for (let i = entryIndex; i < breakevenIndex; i++) {
-              realCost += realData.mintingData[i].contributionToCause;
-            }
-          }
-        }
-        
-        metadata.set(entryPoint, {
-          entryPoint,
-          breakevenN,
-          playsToBreakeven,
-          realCost,
-        });
-      });
-      
-      setInvestorMetadata(metadata);
-      setIsLoading(false);
-    });
+    loadData();
   }, []);
+
+  // Refetch latest CSV and recompute metadata
+  const loadData = async () => {
+    setIsLoading(true);
+    const [lines, realData] = await Promise.all([getInvestorData(), getRealData()]);
+    setInvestorLines(lines);
+    setMintingData(realData.mintingData);
+
+    const metadata = new Map<number, InvestorMetadata>();
+    lines.forEach(investor => {
+      const entryPoint = investor.entryPoint;
+      let breakevenN: number | null = null;
+      for (let i = 0; i < investor.profitData.length - 1; i++) {
+        const current = investor.profitData[i];
+        const next = investor.profitData[i + 1];
+        if (current.n >= entryPoint) {
+          if (current.profit <= 0 && next.profit > 0) {
+            breakevenN = next.n;
+            break;
+          }
+        }
+      }
+      let playsToBreakeven: number | null = null;
+      let realCost: number | null = null;
+      if (breakevenN !== null) {
+        playsToBreakeven = breakevenN - entryPoint;
+        const entryIndex = realData.mintingData.findIndex(d => d.n === entryPoint);
+        const breakevenIndex = realData.mintingData.findIndex(d => d.n === breakevenN);
+        if (entryIndex !== -1 && breakevenIndex !== -1) {
+          realCost = 0;
+          for (let i = entryIndex; i < breakevenIndex; i++) {
+            realCost += realData.mintingData[i].contributionToCause;
+          }
+        }
+      }
+      metadata.set(entryPoint, { entryPoint, breakevenN, playsToBreakeven, realCost });
+    });
+    setInvestorMetadata(metadata);
+    setIsLoading(false);
+  };
 
   if (isLoading || investorLines.length === 0) {
     return (

@@ -77,9 +77,8 @@ const parseCSVData = (csvText: string): {
 let cachedData: { mintingData: MintData[], breakevenData: BreakevenEntry[] } | null = null;
 
 export const getRealData = async () => {
-  if (cachedData) return cachedData;
-  
-  const response = await fetch('/minting-data.csv');
+  // Always refetch to reflect latest CSV updates
+  const response = await fetch(`/minting-data.csv?t=${Date.now()}`, { cache: 'no-store' });
   const csvText = await response.text();
   cachedData = parseCSVData(csvText);
   return cachedData;

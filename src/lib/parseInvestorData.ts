@@ -76,9 +76,8 @@ const parseCSVData = (csvText: string): InvestorLine[] => {
 let cachedInvestorData: InvestorLine[] | null = null;
 
 export const getInvestorData = async (): Promise<InvestorLine[]> => {
-  if (cachedInvestorData) return cachedInvestorData;
-  
-  const response = await fetch('/minting-data.csv');
+  // Always fetch fresh data to reflect latest CSV updates
+  const response = await fetch(`/minting-data.csv?t=${Date.now()}`, { cache: 'no-store' });
   const csvText = await response.text();
   cachedInvestorData = parseCSVData(csvText);
   return cachedInvestorData;
