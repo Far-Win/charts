@@ -9,6 +9,7 @@ export interface InvestorLine {
 }
 
 // Parse the investor profit/loss data from the new CSV
+// Columns 6-23 represent Investors 1-18 (regardless of header labels)
 const parseCSVData = (csvText: string): InvestorLine[] => {
   const lines = csvText.trim().split('\n');
   
@@ -16,26 +17,15 @@ const parseCSVData = (csvText: string): InvestorLine[] => {
     return [];
   }
 
-  // Parse header row to find investor columns
-  const header = lines[0].split(',');
-  const investorColumns: { index: number; investorNum: number }[] = [];
+  // Map columns 6-23 (18 columns) to Investors 1-18
+  const FIRST_INVESTOR_COLUMN = 6;
+  const NUM_INVESTORS = 18;
   
-  header.forEach((col, idx) => {
-    const trimmedCol = col.trim();
-    if (trimmedCol.startsWith('Investor')) {
-      const match = trimmedCol.match(/Investor\s+(\d+)/);
-      if (match) {
-        const investorNum = parseInt(match[1]);
-        investorColumns.push({ index: idx, investorNum });
-      }
-    }
-  });
-
-  // Initialize investor lines
+  // Initialize investor lines for Investors 1-18
   const investorMap = new Map<number, InvestorDataPoint[]>();
-  investorColumns.forEach(({ investorNum }) => {
-    investorMap.set(investorNum, []);
-  });
+  for (let i = 1; i <= NUM_INVESTORS; i++) {
+    investorMap.set(i, []);
+  }
 
   // Parse data rows (skip header)
   for (let i = 1; i < lines.length; i++) {
@@ -47,10 +37,12 @@ const parseCSVData = (csvText: string): InvestorLine[] => {
     
     if (isNaN(n)) continue;
     
-    // Extract profit values for each investor
-    investorColumns.forEach(({ index, investorNum }) => {
-      if (index < values.length) {
-        const profitStr = values[index].trim();
+    // Extract profit values for each investor (columns 6-23)
+    for (let investorNum = 1; investorNum <= NUM_INVESTORS; investorNum++) {
+      const columnIndex = FIRST_INVESTOR_COLUMN + (investorNum - 1);
+      
+      if (columnIndex < values.length) {
+        const profitStr = values[columnIndex].trim();
         if (profitStr !== '') {
           const profit = parseFloat(profitStr);
           if (!isNaN(profit)) {
@@ -58,12 +50,12 @@ const parseCSVData = (csvText: string): InvestorLine[] => {
           }
         }
       }
-    });
+    }
   }
 
   // Convert map to array
   const investorLines: InvestorLine[] = [];
-  investorColumns.forEach(({ investorNum }) => {
+  for (let investorNum = 1; investorNum <= NUM_INVESTORS; investorNum++) {
     const profitData = investorMap.get(investorNum) || [];
     if (profitData.length > 0) {
       investorLines.push({
@@ -71,7 +63,7 @@ const parseCSVData = (csvText: string): InvestorLine[] => {
         profitData,
       });
     }
-  });
+  }
 
   return investorLines;
 };
