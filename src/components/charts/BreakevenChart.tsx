@@ -99,6 +99,7 @@ const BreakevenChart = () => {
               label={{ value: 'Mint Number (N)', position: 'insideBottom', offset: -10, fill: 'hsl(var(--muted-foreground))' }}
               domain={[100, 500]}
               type="number"
+              allowDataOverflow={true}
             />
             <YAxis
               stroke="hsl(var(--muted-foreground))"
