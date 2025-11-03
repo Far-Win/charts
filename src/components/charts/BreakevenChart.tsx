@@ -105,6 +105,7 @@ const BreakevenChart = () => {
               stroke="hsl(var(--muted-foreground))"
               label={{ value: 'Profit/Loss (ETH)', angle: -90, position: 'insideLeft', fill: 'hsl(var(--muted-foreground))' }}
               domain={[-1, 2]}
+              allowDataOverflow={true}
             />
             <Tooltip 
               contentStyle={{ 
