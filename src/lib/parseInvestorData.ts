@@ -78,7 +78,7 @@ let cachedInvestorData: InvestorLine[] | null = null;
 export const getInvestorData = async (): Promise<InvestorLine[]> => {
   if (cachedInvestorData) return cachedInvestorData;
   
-  const response = await fetch('/investor-data.csv');
+  const response = await fetch('/minting-data.csv');
   const csvText = await response.text();
   cachedInvestorData = parseCSVData(csvText);
   return cachedInvestorData;
